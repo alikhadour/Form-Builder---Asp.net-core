@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Form Builder</h1>
+</div>
+<div id="build-wrap"></div>
+<script>
+    jQuery($ => {
+        const fbEditor = document.getElementById("build-wrap");
+        var options = {
+            onSave: function (evt, formData) {
+                $.ajax({
+                url: '@Url.Action("SaveFormTemplate")',
+                type: 'POST',
+                data: { formData },
+                    success: function (response) {
+                        if (response) {
+                            $("#build-wrap").formRender({ formData });
+                        }
+                        else {
+                            alert("some error");
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("some error");
+                    }
+                });
+                
+            }
+        };
+        $(fbEditor).formBuilder(options);
+
+    })
+</script>
