@@ -21,7 +21,7 @@
         // get tje locations
         locations = @Html.Raw(Json.Serialize(Model));
         let lng;
-    let lat;
+        let lat;
         mapboxgl.accessToken = '@Html.Raw(ViewData["MapAccessToken"])';
 
         const map = new mapboxgl.Map({

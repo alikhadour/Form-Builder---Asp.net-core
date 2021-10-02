@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Form_Builder.ViewModels
 {
+    // Form Details
+    // the form and its submissions
     public class FormDetails
     {
         public Form Form { get; set; }

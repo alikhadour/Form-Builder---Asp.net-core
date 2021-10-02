@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace Form_Builder.ViewModels
 {
+    /*
+     * Location Class
+     * represents a location (longitude, latitude
+     */
     public class Location
     {
         public double lng { get; set; }

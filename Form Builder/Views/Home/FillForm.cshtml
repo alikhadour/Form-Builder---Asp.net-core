@@ -1,7 +1,7 @@
 ﻿@model Form_Builder.Models.Form
 
 @{
-    ViewData["Title"] = "FillForm";
+    ViewData["Title"] = "Submit Form";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -27,6 +27,7 @@
         return doc.documentElement.textContent;
     }
     jQuery($ => {
+        // get the form content and render it
         let formData = '@Html.DisplayFor(model => model.FormContent)';
         formData = htmlDecode(formData)
         $('#form-render-wrap').formRender(
@@ -35,6 +36,7 @@
                 dataType: 'json'
             }
         );
+        // save the submission
         $('#form').on('submit', function (e) {
             e.preventDefault();
             // Collect form data
@@ -48,7 +50,6 @@
                     submissionData: JSON.stringify(submissionData),
                 },
                 success: function (response) {
-                    console.log(response)
                     if (response) {
                         Swal.fire(
                             'Success!',

@@ -16,13 +16,20 @@
 
 <script>
     jQuery($ => {
+        // get the form info 
         var form = @Html.Raw(Model.Form.FormContent);
+        // get the submissions of the form
         var submissions = @Html.Raw(Json.Serialize(Model.Submissions));
+        // array of data: contains the submitted values
         var arrayOfData = [];
+        // names of the columns of the form
         var columns = [];
+        // boolean to check if the form has a location list
         var hasLocationList = false
+        // locations selected in all submissions
         var locationListDataFields = []
 
+        // get the names of the columns and check if the form has a locationList
         form.forEach(field => {
             if (!(field.type === 'button')) {
                 var obj = {};
@@ -35,10 +42,9 @@
             }
         })
 
-
+        // get the values of the submissions of the forms
         for (let i = 0; i < submissions.length; i++) {
             var submissionData = JSON.parse(submissions[i].submissionData)
-            console.log(submissionData)
             var obj = {};
             let j = 0
             submissionData.forEach(field => {
@@ -48,6 +54,7 @@
             arrayOfData.push(obj)
         }
 
+        // create the DevExtreme data grid
         var dataGrid = $("#grid-container").dxDataGrid({
             paging: {
                 pageSize: 10
@@ -69,18 +76,21 @@
             columns: columns
         }).dxDataGrid("instance");
 
+        // show the "show on map" button if the form has location list input
         if (hasLocationList) {
             $('#show-on-map-btn').removeClass('hidden')
         }
 
-        console.log(locationListDataFields)
+        // requesting to show the submited locations on the map
         $('#show-on-map-btn').click(() => {
             var selectedLocations = [];
+            // get the locations from the selected rows
             dataGrid.getSelectedRowsData().forEach(row => {
                 locationListDataFields.forEach(field => {
                     selectedLocations.push(row[field]);
                 })
             });
+            // do a post request to open a pop-up with the map
             $.ajax({
                 url: '@Url.Action("ShowPointsOnMap")',
                 type: 'POST',
@@ -92,11 +102,19 @@
                             newWin.document.write(html);
                         }
                         else {
-                            alert("some error");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Something went wrong, please try again!',
+                            });
                         }
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        console.log(XMLHttpRequest);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Something went wrong, please try again!',
+                        });
                     }
                 });
         });
