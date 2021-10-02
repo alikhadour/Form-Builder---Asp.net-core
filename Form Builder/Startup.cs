@@ -26,12 +26,24 @@ namespace Form_Builder
         {
             services.AddDbContext<FormBuilderDBContext>(options =>
                                 options.UseSqlServer(Configuration.GetConnectionString("FormBuilderDBContextConnection")));
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+                                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                            );
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/NotFound";
+                    await next();
+                }
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -40,6 +52,8 @@ namespace Form_Builder
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -52,6 +66,8 @@ namespace Form_Builder
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            
         }
     }
 }

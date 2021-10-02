@@ -17,17 +17,31 @@
                 data: { formData },
                     success: function (response) {
                         if (response) {
-                            $("#build-wrap").formRender({ formData });
+                            Swal.fire(
+                                'Success!',
+                                'The form is created successfully!',
+                                'success'
+                            ).then(function () {
+                                window.location.replace("@Url.Action("Forms")");
+                            });
                         }
                         else {
-                            alert("some error");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Something went wrong, please try again!',
+                            });
                         }
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("some error");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Something went wrong, please try again!',
+                        });
                     }
                 });
-                
+
             }
         };
         $(fbEditor).formBuilder(options);

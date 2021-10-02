@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Form_Builder.ViewModels.Location>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Picked Locations</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css"
+          rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js"></script>
+    <link href="~/css/site.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div id="map"></div>
+<script>
+        // get tje locations
+        locations = @Html.Raw(Json.Serialize(Model));
+        let lng;
+    let lat;
+        mapboxgl.accessToken = '@Html.Raw(ViewData["MapAccessToken"])';
+
+        const map = new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/streets-v11",
+            center: [0, 0],
+            zoom: 0,
+        });
+
+        locations.forEach(location => {
+            // create a HTML element for each feature
+            const el = document.createElement('div');
+            el.className = 'marker';
+            new mapboxgl.Marker(el).setLngLat(location).addTo(map);
+        })
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+﻿@model Form_Builder.ViewModels.FormDetails
+
+@{
+    ViewData["Title"] = "Form Submissions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>List Of Form Submissions</h1>
+
+<div class="dx-viewport demo-container">
+    <div id="grid-container"></div>
+    <div class="options">
+        <button id="show-on-map-btn" class="hidden btn btn-primary">SHow selected rows' locations on map</button>
+    </div>
+</div>
+
+<script>
+    jQuery($ => {
+        var form = @Html.Raw(Model.Form.FormContent);
+        var submissions = @Html.Raw(Json.Serialize(Model.Submissions));
+        var arrayOfData = [];
+        var columns = [];
+        var hasLocationList = false
+        var locationListDataFields = []
+
+        form.forEach(field => {
+            if (!(field.type === 'button')) {
+                var obj = {};
+                obj["dataField"] = field.label
+                columns.push(obj)
+                if (field.type === 'locationList') {
+                    hasLocationList = true
+                    locationListDataFields.push(field.label)
+                }
+            }
+        })
+
+
+        for (let i = 0; i < submissions.length; i++) {
+            var submissionData = JSON.parse(submissions[i].submissionData)
+            console.log(submissionData)
+            var obj = {};
+            let j = 0
+            submissionData.forEach(field => {
+                obj[columns[j++].dataField] = field.value
+            })
+
+            arrayOfData.push(obj)
+        }
+
+        var dataGrid = $("#grid-container").dxDataGrid({
+            paging: {
+                pageSize: 10
+            },
+            searchPanel: {
+                visible: true,
+                highlightCaseSensitive: true
+            },
+            selection: {
+                mode: 'multiple',
+                showCheckBoxesMode: hasLocationList ? 'always' : 'none',
+                allowSelectAll: true
+            },
+            dataSource: arrayOfData,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            columns: columns
+        }).dxDataGrid("instance");
+
+        if (hasLocationList) {
+            $('#show-on-map-btn').removeClass('hidden')
+        }
+
+        console.log(locationListDataFields)
+        $('#show-on-map-btn').click(() => {
+            var selectedLocations = [];
+            dataGrid.getSelectedRowsData().forEach(row => {
+                locationListDataFields.forEach(field => {
+                    selectedLocations.push(row[field]);
+                })
+            });
+            $.ajax({
+                url: '@Url.Action("ShowPointsOnMap")',
+                type: 'POST',
+                data: { selectedLocations },
+                    success: function (response) {
+                        if (response) {
+                            let newWin = window.open('about:blank', 'map', 'width=900,height=900')
+                            let html = response;
+                            newWin.document.write(html);
+                        }
+                        else {
+                            alert("some error");
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(XMLHttpRequest);
+                    }
+                });
+        });
+
+    })
+</script>
